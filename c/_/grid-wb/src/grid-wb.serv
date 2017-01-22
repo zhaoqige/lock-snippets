@@ -1,0 +1,32 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+STOP=99
+
+APP=grid-wb
+KILL=grid-sp
+CONF=/etc/config/$APP
+CMD=/usr/sbin/$APP
+
+uci_conf() {
+	local conf="$1"
+	
+	config_get dev 		"$conf" dev
+	config_get idle 	"$conf" idle
+
+	killall $KILL >/dev/null 2>&1
+	$CMD -D $dev -s $idle >/dev/null 2>&1 &
+}
+
+start() {
+	if [ -f $CONF ]; then
+		config_load $CONF
+		config_foreach uci_conf $APP
+	else
+		echo "* config file missing"
+	fi
+}
+
+stop() {
+	killall $APP
+}

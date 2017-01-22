@@ -1,0 +1,7 @@
+2016 (c) 6Harmonics
+GRID: GWS Remote Interface Daemon
+
+grid-wb 	via SP/UART (WBCtrlSP);
+grid-sp		via SP/UART (GWSCtrlSP);
+grid-lite 	via UDP (GWSCtrlLite);
+grid-adv 	via TCP (GWSCtrlAdv);
