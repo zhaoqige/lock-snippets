@@ -1,0 +1,19 @@
+#!/bin/sh
+
+gws_tpc=/etc/config/gws-tpc
+
+if [ -f "$gws_tpc" ]; then
+	if [ -n "$2" ]; then
+		echo "* set gws-tpc txpwr_max=$2"
+		uci set gws-tpc.v1.txpwr=$2
+		uci set gws-tpc.v1.txpwr_max=$2
+		uci commit gws-tpc
+	fi
+
+	if [ -n "$1" ]; then
+		echo "* set peer_max=$1"
+		uci set gws-tpc.v1.peer_max=$1
+		uci commit gws-tpc
+		/etc/init.d/gws-tpc restart
+	fi
+fi

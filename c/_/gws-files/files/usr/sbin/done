@@ -1,0 +1,9 @@
+#!/bin/sh
+# disable ttyS0
+sed 's/ttyS0/#ttyS0/' /etc/inittab > /tmp/inittab.tmp
+cp /tmp/inittab.tmp /etc/inittab
+
+# remove packages
+opkg remove openssh-sftp-server
+opkg remove gdbserver
+opkg remove grid-adv

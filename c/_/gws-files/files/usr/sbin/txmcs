@@ -1,0 +1,22 @@
+#!/bin/sh
+# 6Harmonics Inc.
+
+mcs=9
+mcs_dfl=4294967295
+entry=/sys/kernel/debug/ieee80211/phy0/rc/fixed_rate_idx
+
+if [ -n "$1" ]; then
+	mcs=$1
+fi
+
+case "$mcs" in
+	[0-7])
+		echo "set tx mcs to $mcs"
+		echo $mcs > $entry
+		;;
+	*)
+		echo "set free tx mcs"
+		echo $mcs_dfl > $entry
+		;;
+esac
+

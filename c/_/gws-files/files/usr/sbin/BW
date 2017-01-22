@@ -1,0 +1,12 @@
+#!/bin/sh
+# 6Harmonics Inc.
+
+if [ -n "$1" ]; then
+	uci set wireless.radio0.chanbw=$1
+	uci commit wireless
+	reboot
+else
+	bw=`uci get wireless.radio0.chanbw`
+	echo "chanbw: $bw"
+fi
+

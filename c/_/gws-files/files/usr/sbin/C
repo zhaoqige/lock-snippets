@@ -1,0 +1,15 @@
+#!/bin/sh
+# 6Harmonics Inc.
+
+gws5k=/usr/sbin/gws5001app
+
+if [ -f "$gws5k" ]; then
+if [ -n "$1" ]; then
+	$gws5k setchan $1
+	#uci set gws-hw.v1.channel=$1
+	#uci commit gws-hw
+else
+	$gws5k getchan
+fi
+fi
+

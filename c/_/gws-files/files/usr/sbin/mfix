@@ -1,0 +1,9 @@
+#!/bin/sh
+
+mode=`uci get wireless.@wifi-iface[0].mode`
+
+if [ "$mode" == "mesh" ]; then
+	if [ -z "$1" ]; then
+		iw wlan0 mpath dump | grep $1 | cut -d " " -f "1 2" | mpath
+	fi
+fi

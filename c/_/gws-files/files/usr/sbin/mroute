@@ -1,0 +1,46 @@
+#!/bin/sh
+
+mode=`uci get wireless.@wifi-iface[0].mode`
+
+via_ip="192.168.1.241"
+via_mac=`cat /etc/mac.txt | grep $via_ip | awk '{print $2}'`
+local_ip=`uci get network.lan.ipaddr`
+
+mac72=`cat /etc/mac.txt | grep 72 | awk '{print $2}'`
+mac241=`cat /etc/mac.txt | grep 241 | awk '{print $2}'`
+mac232=`cat /etc/mac.txt | grep 232 | awk '{print $2}'`
+mac233=`cat /etc/mac.txt | grep 233 | awk '{print $2}'`
+
+if [ "$mode" == "mesh" ]; then
+
+# if 241, direct mpath
+if [ "$local_ip" == "$via_ip" ]; then
+	echo " set direct mpath."
+	mpath $mac72 $mac72 >/dev/null 2>&1 
+	mpath $mac232 $mac232 >/dev/null 2>&1 
+	mpath $mac233 $mac233 >/dev/null 2>&1 
+else
+	i=1
+	while true; do
+		echo " trying $via_ip/$via_mac ..."
+		until ping -c1 -w1 $via_ip | grep ttl > /dev/null 2>&1
+		do
+			echo " $i. target $via_ip/$via_mac is not alive"
+			mpath $mac241
+			mpath $mac72 $mac72
+			mpath $mac232 $mac232
+			#mpath $mac233 $mac233
+			sleep 1
+		done
+		echo " $i. target $via_ip/$via_mac is alive"
+		mpath $mac241 $mac241 >/dev/null 2>&1 
+		mpath $mac72 $mac241 >/dev/null 2>&1 
+		mpath $mac232 $mac241 >/dev/null 2>&1 
+		#mpath $Mac233 $mac241 >/dev/null 2>&1 
+		sleep 1
+
+		i=$(($i+1))
+	done
+fi
+
+fi

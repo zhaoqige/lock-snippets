@@ -1,0 +1,27 @@
+#!/bin/sh
+
+mode=`uci get wireless.@wifi-iface[0].mode`
+dmac=/tmp/mdmac
+smac=/tmp/msmac
+
+if [ "$mode" == "mesh" ]; then
+	if [ -n "$1" ]; then
+		if [ -z "$2" ]; then
+			rm $dmac >/dev/null 2>&1
+			iw wlan0 mpath dump | grep $1 | cut -d ' ' -f1 > $dmac
+			iw wlan0 mpath del `cat $dmac`
+		else
+			rm $dmac >/dev/null 2>&1
+			rm $smac >/dev/null 2>&1
+			iw wlan0 mpath dump | grep $1 | cut -d ' ' -f1 > $dmac
+			iw wlan0 mpath dump | grep $2 | cut -d ' ' -f1 > $smac
+			iw wlan0 mpath set `cat $dmac` next_hop `cat $smac` >/dev/null 2>&1
+		fi
+	else
+		echo "usage: mpath"
+		echo "       mpath <mac to del>"
+		echo "       mpath <mac to> <mac via>"
+		echo "-------- -------- -------- --------"
+	fi
+	iw wlan0 mpath dump
+fi

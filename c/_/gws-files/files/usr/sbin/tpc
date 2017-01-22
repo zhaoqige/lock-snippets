@@ -1,0 +1,12 @@
+#!/bin/sh
+GWS=/usr/sbin/gws5001app
+TPC=/usr/sbin/gws-tpc
+
+if [ -f "$GWS" ]; then
+	gws5001app setrssical 0
+	gws5001app setrxgain 8
+fi
+if [ -f "$TPC" ]; then
+	/etc/init.d/gws-tpc start
+	/etc/init.d/gws-tpc enable
+fi

@@ -1,0 +1,5 @@
+#!/bin/sh
+GWS=/usr/sbin/gws
+if [ -f "$GWS" ]; then
+	$GWS
+fi

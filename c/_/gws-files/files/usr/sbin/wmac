@@ -1,0 +1,2 @@
+#!/bin/sh
+ifconfig wlan0 | grep HWaddr.* -o | cut -d ' ' -f 2

@@ -1,0 +1,2 @@
+#!/bin/sh
+cat /etc/manifest.txt | grep Baseline | grep Version

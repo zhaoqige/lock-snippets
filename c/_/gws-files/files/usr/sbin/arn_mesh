@@ -1,0 +1,33 @@
+#!/bin/sh
+
+uci_save() {
+	uci commit wireless
+}
+
+uci_clean() {
+	uci del wireless.@wifi-iface[0]
+}
+
+arn_mesh() {
+	uci set wireless.radio0.distance=26000
+
+	uci add wireless wifi-iface
+	uci set wireless.@wifi-iface[0].device=radio0
+	uci set wireless.@wifi-iface[0].network=lan
+	uci set wireless.@wifi-iface[0].wds=1
+	uci set wireless.@wifi-iface[0].mode=mesh
+	uci set wireless.@wifi-iface[0].mesh_id=gwsmesh2016
+	uci set wireless.@wifi-iface[0].encryption=none
+	#uci set wireless.@wifi-iface[0].encryption=psk2
+	#uci set wireless.@wifi-iface[0].key=6Harmonics
+}
+
+
+
+uci_clean
+echo "set Mesh mode"
+arn_mesh
+uci_save
+
+wifi >/dev/null 2>& 1
+

@@ -1,0 +1,68 @@
+Version & Release: FWBJ_v2.4.161116q
+Baseline Version: GWS HostFirmware-Rel8.1-3
+-------------------------------------------------------------------------------
+Application & Libraries Version: 2016.11.16
+Application: grid-lite/grid-sp/grid-wb/gws/gws-tpc
+Libraries: gws-bb/gws-files/gws-hw/gws-cs
+Contact: +1-(613)-252-7238/+86-(10)-8282-5799
+-------------------------------------------------------------------------------
+History:
+FWBJ_v2.4:
+	support +wb1.6c;
+	let gws-hw control init radio settings;
+	adjust boot sequence of gws5001radiodrv/gws5001app/gws-hw/grid-wb;
+	add mpath for mesh route;
+	161116: for 4th pk with zonkin;
+
+FWBJ_v2.3: 
+	1 vs multi-EARs iwinfo for AGC
+	add shortcut for chanbw/chan/txpwr/rxgain/AGC
+
+FWBJ_v2.2: (App version 7.0/8.x)
+	gws5k-tpc: based on AGC/rssical;
+
+FWBJ_v2.1: (App version 6.0-x)
+	support gws5001;
+	verified each package on gws5001;
+	gws-bb: baseband data collector;
+	gws-files: base scripts;
+	gws-dd: device discovery;
+	gws5k-hw: gws5001 hardware controller;
+	gws5k: gws5001 user command line;
+
+FWBJ_v2.0: (App version 5.0-x)
+	support gws5001;
+	gws-dd: device discovery;
+	gws-files: base scripts;
+	gws-bb: baseband data collector, share via share memory;
+	gws-tpc: tx power control;
+
+	gws3k: gws3000 user command line;
+	gws3k-cs: gws3000 channel scanner;
+	gws3k-hw: gws3000 hardware controller;
+
+	gws5k: gws5000 user command line;
+	gws5k-cs: gws5000 channel scanner;
+	gws5k-hw: gws5000 hardware controller;
+
+
+FWBJ_v1.2 Functions:
+	gws3k-files: add all script/files to right place;
+	gws3k-hw: control & answer CMD via msg;
+	gws3k-bb: collect baseband data, share via shm;
+	gws3k-nf: channel scan;
+	grid3k: user cli;
+	grid-wb: lcdctrl_v1.6+;
+	grid-sp: lcdctrl_v2.0+;
+	grid-lite: share tx chain status via UDP;
+	grid-adv: co-work with GRID3 (MFC App);
+	gwsdd: co-work with GRID3;
+	rarpd: provide RARP response;
+	rarp: user cli, get ip by MAC.
+
+Prototype:
+	FWBJ_v1.0: add gws3k-files/gws3k-hw/gws3k-bb; add grid-wb;
+	FWBJ_v1.1: add grid-sp/grid-lite;
+	FWBJ_v1.2: add rarpd/rarp; add gws3k-nf; 
+	FWBJ_v1.3: add tpctrl;
+

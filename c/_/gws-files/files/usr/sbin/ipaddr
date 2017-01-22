@@ -1,0 +1,5 @@
+#!/bin/sh
+
+#uci get network.lan.ipaddr
+
+ifconfig br-lan | grep inet | grep addr.* -o | cut -d' ' -f1 | cut -d':' -f2

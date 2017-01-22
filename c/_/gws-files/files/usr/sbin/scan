@@ -1,0 +1,2 @@
+#!/bin/sh
+iwinfo wlan0 s

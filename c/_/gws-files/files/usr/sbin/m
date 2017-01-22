@@ -1,0 +1,7 @@
+#!/bin/sh
+GWS=/usr/sbin/gws
+if [ -f "$GWS" ]; then
+	$GWS -t 10000
+	clear
+fi
+
