@@ -3,7 +3,7 @@
  *
  *  Created on: July 13, 2016
  *  Updated on: Jan 22, 2017
- *      Author: YY WANG, Qige
+ *      Author: YY Wang, Qige
  *  Maintainer: Qige
  */
 
@@ -19,8 +19,10 @@ typedef unsigned short 			ushort;
 #define MIN(x, y)					(x < y ? x : y)
 
 // empty debug print out
-#ifndef _DBG
-#define _DBG(fmt, ...)			{}
+#ifdef ENV_DEBUG_LPCACHE
+#define LPC_DBG(format, ...)		{printf("<lp cache> "format, ##__VA_ARGS__);}
+#else
+#define LPC_DBG(fmt, ...)			{}
 #endif
 
 

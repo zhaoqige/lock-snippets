@@ -3,7 +3,8 @@
  *
  *  Created on: July 13, 2016
  *  Updated on: Jan 22, 2017
- *      Author: Qige
+ *      Author: YY Wang, Qige
+ *  Maintainer: Qige
  */
 
 #ifndef _UART_H_
@@ -16,13 +17,14 @@ typedef char					byte;
 typedef unsigned short 			ushort;
 
 // empty debug print out
-#ifndef _DBG
-#define _DBG(fmt, ...)			{}
+#ifdef ENV_DEBUG_UART
+#define UART_DBG(format, ...)		{printf("<uart> "format, ##__VA_ARGS__);}
+#else
+#define UART_DBG(fmt, ...)			{}
 #endif
 
-#ifndef
-#define UART_SPEED_DEFAULT    B9600 // B9600, B115200
-#endif
+// pre defines
+#define UART_SPEED_DEFAULT		B9600
 #define UART_FD_INVALID_BAR		2
 
 enum UART_ERR {

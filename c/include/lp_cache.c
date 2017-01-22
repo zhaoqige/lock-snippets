@@ -3,7 +3,7 @@
  *
  *  Created on: July 13, 2016
  *  Updated on: Jan 22, 2017
- *      Author: YY WANG, Qige
+ *      Author: YY Wang, Qige
  *  Maintainer: Qige
  */
 #include <stdio.h>
@@ -20,6 +20,9 @@ void lpc_init(LPCache *lpc)
 
 	lpc->data_head = lpc->start;
 	lpc->data_length = 0;
+
+
+	LPC_DBG("empty all data, reset all\n");
 }
 
 /*
@@ -56,6 +59,11 @@ int lpc_save(LPCache *lpc, const byte *data, const uint data_length)
 	} else {
 		da_tail = 0;
 	}
+
+	LPC_DBG("length/data length/bytes available = %d/%d/%d\n",
+			lpc_length, lpc_data_length, lpc_da_length);
+	LPC_DBG("data head/tail = %d/%d, bytes available in tail = %d\n",
+			dh_to_start, dh_to_tail, da_tail);
 
 	//+ save
 	if (lpc_data_length > 0) {
@@ -106,6 +114,11 @@ int lpc_read(LPCache *lpc, byte *buff, uint *buff_length)
 	int b2read = MIN(*buff_length, lpc_data_length);
 	*buff_length = b2read;
 
+	LPC_DBG("length/data length = %d/%d\n",
+			lpc_length, lpc_data_length);
+	LPC_DBG("data head/tail = %d/%d, bytes to read = %d\n",
+			dh_to_start, dh_to_tail, b2read);
+
 	if (dh_to_tail >= b2read) {
 		memcpy(buff, lpc->data_head, b2read);
 	} else {
@@ -139,6 +152,11 @@ int lpc_move(LPCache *lpc, uint move)
 	unsigned int dh_to_head, dh_to_tail;
 	dh_to_head = lpc->data_head - lpc->start;
 	dh_to_tail = lpc_length - dh_to_head;
+
+	LPC_DBG("length/data length = %d/%d\n",
+			lpc_length, lpc_data_length);
+	LPC_DBG("data head/tail = %d/%d, bytes to read = %d\n",
+			dh_to_start, dh_to_tail, b2read);
 
 	if (lpc_data_length > move) {
 		if (dh_to_tail > move) {

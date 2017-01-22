@@ -22,7 +22,9 @@ typedef union {
 	} bytes;
 } U_UInt2UShort;
 
-// 0: Big-endian, 1: Little-endian
+
+// @return 0: Big-endian
+// @return 1: Little-endian
 int env_little_endian(void);
 
 #endif /* BASE_H_ */
