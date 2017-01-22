@@ -1,0 +1,43 @@
+#!/bin/sh /etc/rc.common
+
+START=90
+STOP=90
+
+APP=gws-hw
+CONF=/etc/config/$APP
+CMD=/usr/sbin/$APP
+DEP=/usr/sbin/gws5001app
+
+uci_conf() {
+	local conf="$1"
+
+	if [ -f "$DEP" ]; then
+		config_get channel	"$conf" channel
+		if [ -n "$channel" ]; then
+			gws5001app setchan $channel
+		fi
+		config_get txpower	"$conf" txpower
+		if [ "$txpower" -gt "0" ]; then
+			gws5001app settxpwr $txpower
+		fi
+	fi
+	
+	config_get key 		"$conf" key
+	config_get idle		"$conf" idle
+
+	$CMD -s $idle -k $key >/dev/null 2>&1 &
+}
+
+start() {
+	if [ -f $CONF ]; then
+		config_load $CONF
+		config_foreach uci_conf $APP
+	else
+		echo "* config file missing, using default settings"
+		$CMD >/dev/null 2>&1 &
+	fi
+}
+
+stop() {
+	killall $APP
+}
