@@ -1,0 +1,163 @@
+/*
+ * lbb.c
+ *
+ *   Algorithm: WYY/Qige
+ *  Created on: May 6, 2016
+ *  Updated on: June 07, 2016
+ *      Author: Qige Zhao <qige@6harmonics.com>
+ */
+
+#include <string.h>
+#include "lbb.h"
+
+
+void lbb_init(void *lbb)
+{
+	struct lbb *b = (struct lbb *) lbb;
+	memset(b, 0, sizeof(struct lbb));
+
+	b->lbb_start = b->lbb_data;
+	b->lbb_length = sizeof(b->lbb_data) - 1;
+
+	b->lbb_data_head = b->lbb_start;
+	b->lbb_data_length = 0;
+}
+
+/*
+ * save data (str/hex) to lbb
+ * - test data length;
+ * - test bytes available;
+ * - calc basic counters;
+ * - copy
+ */
+int lbb_save(void *lbb, const void *data, const unsigned int data_length)
+{
+	const char *d = (char *) data;
+	struct lbb *b = (struct lbb *) lbb;
+
+	//+ buffer length = data length + data available length
+	unsigned int lbb_length, lbb_data_length, lbb_da_length;
+	lbb_length = b->lbb_length;
+	lbb_data_length = b->lbb_data_length;
+	lbb_da_length = lbb_length - lbb_data_length;
+
+	if (data_length < 1)
+		return LBB_ERR_DATAINVALID;
+	if (data_length > lbb_da_length)
+		return LBB_ERR_NOSPACE;
+
+	//+ buffer length = data head to start + data head to tail
+	unsigned int dh_to_start, dh_to_tail;
+	dh_to_start = b->lbb_data_head - b->lbb_start;
+	dh_to_tail = lbb_length - dh_to_start;
+
+	//+ data available
+	unsigned int da_tail;
+	if (dh_to_tail >= lbb_data_length) {
+		da_tail = dh_to_tail - lbb_data_length;
+	} else {
+		da_tail = 0;
+	}
+
+	//+ save
+	if (lbb_data_length > 0) {
+		if (da_tail >= data_length) {
+			memcpy(b->lbb_data_head+lbb_data_length, d, data_length);
+		} else {
+			memcpy(b->lbb_data_head+lbb_data_length, d, da_tail);
+			if (lbb_data_length > dh_to_tail) {
+				memcpy(b->lbb_start+(lbb_data_length-dh_to_tail), &d[da_tail], data_length - da_tail);
+			} else {
+				memcpy(b->lbb_start, &d[da_tail], data_length - da_tail);
+			}
+		}
+	} else {
+		memcpy(b->lbb_start, d, data_length);
+	}
+	b->lbb_data_length += data_length;
+
+	return LBB_OK;
+}
+
+/*
+ * read loopback buffer data (ascii/hex)
+ */
+int lbb_read(void *lbb, void *buf, unsigned int *buf_length, const int flag_clean)
+{
+	if (*buf_length < 1)
+		return LBB_ERR_NOSPACE;
+
+	char *d = (char *) buf;
+	struct lbb *b = (struct lbb *) lbb;
+
+
+	//+ buffer length = data length + data available length
+	unsigned int lbb_length, lbb_data_length;
+	lbb_length = b->lbb_length;
+	lbb_data_length = b->lbb_data_length;
+
+	//+ buffer length = data head to start + data head to tail
+	unsigned int dh_to_head, dh_to_tail;
+	dh_to_head = b->lbb_data_head - b->lbb_start;
+	dh_to_tail = lbb_length - dh_to_head;
+
+	//+ calc bytes to read
+	int b2read = MIN(*buf_length, lbb_data_length);
+	*buf_length = b2read;
+
+	if (dh_to_tail >= b2read) {
+		memcpy(d, b->lbb_data_head, b2read);
+	} else {
+		memcpy(d, b->lbb_data_head, dh_to_tail);
+		memcpy(&d[dh_to_tail], b->lbb_start, b2read - dh_to_tail);
+	}
+
+	if (flag_clean)
+		lbb_move(lbb, *buf_length);
+
+	return LBB_OK;
+}
+
+/*
+ * discard data of b2move bytes
+ * - data length <= b2move, init
+ * -
+ */
+int lbb_move(void *lbb, unsigned int b2move)
+{
+	if (b2move < 1) return LBB_OK;
+
+	struct lbb *b = (struct lbb *) lbb;
+
+	//+ buffer length = data length + data available length
+	unsigned int lbb_length, lbb_data_length;
+	lbb_length = b->lbb_length;
+	lbb_data_length = b->lbb_data_length;
+
+	//+ buffer length = data head to start + data head to tail
+	unsigned int dh_to_head, dh_to_tail;
+	dh_to_head = b->lbb_data_head - b->lbb_start;
+	dh_to_tail = lbb_length - dh_to_head;
+
+	if (lbb_data_length > b2move) {
+		if (dh_to_tail > b2move) {
+#ifdef CLEAR_WHEN_MOVE
+			int i;
+			for(i = 0; i < b2move; i ++) *(b->lbb_data_head+i) = '\0';
+#endif
+			b->lbb_data_head += b2move;
+		} else {
+#ifdef CLEAR_WHEN_MOVE
+			int i;
+			for(i = 0; i <= dh_to_tail; i ++) *(b->lbb_data_head+i) = '\0';
+			for(i = 0; i < b2move - dh_to_tail; i ++) *(b->lbb_start+i) = '\0';
+#endif
+			b->lbb_data_head = b->lbb_start + (b2move - dh_to_tail);
+		}
+		b->lbb_data_length -= b2move;
+	} else {
+		lbb_init(lbb);
+	}
+
+	return LBB_OK;
+}

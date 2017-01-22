@@ -1,0 +1,48 @@
+#!/bin/sh /etc/rc.common
+
+START=80
+STOP=80
+
+APP=gws-hw
+CONF=/etc/config/$APP
+CMD=/usr/sbin/$APP
+DEP=/usr/sbin/gws
+
+uci_conf() {
+	local conf="$1"
+
+	if [ -f "$DEP" ]; then
+		config_get channel	"$conf" channel
+		if [ -n "$channel" ]; then
+			$DEP -C $channel >/dev/null 2>&1 
+		fi
+		config_get txpower	"$conf" txpower
+		if [ "$txpower" -gt "0" ]; then
+			$DEP -P $txpower >/dev/null 2>&1 
+		fi
+	fi
+	
+	config_get key 		"$conf" key
+	config_get idle		"$conf" idle
+
+	config_get dev		"$conf" dev
+	if [ -f "$dev" ]; then
+		$CMD -F -D $dev -k $key >/dev/null 2>&1 &
+	else
+		$CMD -F -D /dev/ttyATH0 -s $idle -k $key >/dev/null 2>&1 &
+	fi
+}
+
+start() {
+	if [ -f $CONF ]; then
+		config_load $CONF
+		config_foreach uci_conf $APP
+	else
+		echo "* config file missing, using default settings"
+		$CMD >/dev/null 2>&1 &
+	fi
+}
+
+stop() {
+	killall $APP
+}
