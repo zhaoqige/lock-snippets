@@ -1,0 +1,6 @@
+Hardware: AR9344+GWS5001+BP4770Red+PA38
+Baseband: AR9344, 2.447 GHz
+GWS Card: GWS5001 v1
+FilterBW: 470~700 MHz, Red
+Tx Power: 10~38 dBm
+ Rx Gain: -32~10 dBm

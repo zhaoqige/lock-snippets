@@ -1,0 +1,43 @@
+#!/bin/sh /etc/rc.common
+
+START=90
+STOP=90
+
+APP=gws-tpc
+CONF=/etc/config/$APP
+CMD=/usr/sbin/$APP
+
+uci_conf() {
+	local conf="$1"
+	
+	config_get port			"$conf" port
+	config_get peer_max		"$conf" peer_max
+	config_get txpwr		"$conf" txpwr
+	config_get txpwr_min 	"$conf" txpwr_min
+	config_get txpwr_max 	"$conf" txpwr_max
+	config_get rxgain		"$conf" rxgain
+	config_get rxgain_near 	"$conf" rxgain_near
+	config_get rxgain_max 	"$conf" rxgain_max
+	config_get idle			"$conf" idle
+	#config_get key 		"$conf" key
+
+	#$CMD -P 36 -x10 -X36 -Y -10 -s5	// 39
+	#$CMD -P 36 -x10 -X36 -Y 8 -s5		// 33
+	$CMD -p $port -P $txpwr -A $peer_max -x $txpwr_min -X $txpwr_max -s $idle -G $rxgain -y $rxgain_near -Y $rxgain_max >/dev/null 2>&1 &
+}
+
+start() {
+	#/usr/sbin/gws5001app setrssical 0
+	if [ -f $CONF ]; then
+		config_load $CONF
+		config_foreach uci_conf $APP
+	else
+		echo "* config file missing, using default settings"
+		$CMD >/dev/null 2>&1 &
+	fi
+}
+
+stop() {
+	killall $APP
+	#/usr/sbin/gws5001app setrssical 1
+}
