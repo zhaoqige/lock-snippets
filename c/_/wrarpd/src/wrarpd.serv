@@ -1,0 +1,20 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+STOP=99
+
+APP=wrarpd
+KILL=rarpd
+CMD=/usr/sbin/$APP
+
+start() {
+	wlan_mac=`wmac`
+	local_ip=`ipaddr`
+
+	killall $KILL 2>/dev/null
+	$CMD $wlan_mac $local_ip >/dev/null 2>&1 &
+}
+
+stop() {
+	killall $APP
+}
