@@ -1,0 +1,9 @@
+1. Clean fork() zombies:
+	In C code:
+		signal(SIGCHLD, SIG_IGN);
+	or
+		wait()/waitpic();
+
+	In Shell:
+		kill -HUP `ps -A -ostat,ppid | grep -e ^[Zz]` | awk '{print $2}'`
+		ps -e -o ppid,stat | grep Z | cut -d " " -f 2 | xargs kill -9
