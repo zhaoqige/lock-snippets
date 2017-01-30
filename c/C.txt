@@ -1,0 +1,67 @@
+Linux C Application Notes
+-------------------------
+by Qige @ Ottawa, 2017.01.30
+
+- Compile Environment;
+- IDE, online debug: Eclipse, gdb, gdbserver;
+- Repository tools: git, svn, fossil, etc.
+
+- Blocking, non-blocking;
+- msg/shm/sem;
+- Functions should return "int" value to mark its errors;
+- Pass "void pointer" when calling functions;
+- Big-endian (MIPS), little-endian (x86);
+
+- Data fetching, saving, reading, parsing, deleting;
+- Use "union" to parse specitic format;
+
+- uart/sp, spi, etc.
+- File ops: open/read/write/ioctrl/close
+- socket: tcp, udp, raw;
+- socket ops: socket/bind/listen/accept/send/recv/close/sendto/recvfrom;
+- select()/poll()/epoll();
+
+- +libiwinfo;
+
+- Author, version, descriptions.
+- Use "typedef";
+- Use "__DATE__", "__TIME__";
+
+- Use "static", "const";
+- Define default values with "#define";
+- Set default params before read user input;
+- Define all return value with "enum";
+
+- Read user input: getopt(), getopt_long_only();
+- Answer "|" as STDIN data;
+- Check all params right away;
+- Print usage/help/version;
+
+- Daemon mode;
+- Init/close;
+- SIGNAL handler (SIGINT, SIGTERM, SIGQUIT);
+- fork(), pthread;
+- Call job(start running)
+- call task(start a specific work, like calling pthread);
+
+- Makefile: compile/cross-compile/scripts;
+- Use "-D", "-I";
+- Print/cancel "debug" messages when "DEBUG"/"RELEASE" (-D RELEASE);
+- Dependency: Dynamic/static libraries;
+- Hardware Platforms (-D GWS5K).
+
+- String: print, printf, sprintf, fprintf, strcmp, strcat, strstr;
+- HEX Mask: "BTN_MASK & dataByte == BTN_MASK";
+- int, unsigned int;
+- unsigned char, char, int, byte;
+- malloc(), calloc();
+- Global params, static params;
+- Loopback buffer/cache;
+- void *, char *, int *, struct st *;
+- st->data, st->data.sn, st.data, st.data.sh;
+
+- Function pointer, example:
+* co-work with "-D HW_GWS5K";
+* "#ifdef HW_GWS5K", "#include 'gws5k.h'", "#endif";
+* "void (*job_init)(const void *)", "job_init = &gws5k_job_init;";
+* "(*job_init)(job_env);"
