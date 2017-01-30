@@ -1,5 +1,14 @@
 // run application in DAEMON mode
 // copied from <mjpg-streamer>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 void daemon_mode(void)
 {
   int fr=0;
