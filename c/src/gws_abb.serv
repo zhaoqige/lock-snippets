@@ -1,0 +1,35 @@
+#!/bin/sh /etc/rc.common
+# Analog Baseband
+
+START=90
+STOP=90
+
+APP=gws_abb
+CONF=/etc/config/$APP
+CMD=/usr/sbin/$APP
+
+uci_conf() {
+	local conf="$1"
+	
+	bw=`uci get wireless.radio0.chanbw`
+	config_get dev 		"$conf" dev
+	config_get key 		"$conf" key
+	config_get range	"$conf" range
+
+	iw phy0 set distance $range
+	$CMD -i $dev -b $bw -k $key >/dev/null 2>&1 &
+}
+
+start() {
+	if [ -f $CONF ]; then
+		config_load $CONF
+		config_foreach uci_conf $APP
+	else
+		echo "* config file missing, using default settings"
+		$CMD >/dev/null 2>&1 &
+	fi
+}
+
+stop() {
+	killall $APP
+}
