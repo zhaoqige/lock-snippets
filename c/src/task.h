@@ -4,18 +4,14 @@
  *  Created on: Jul 25, 2016
  *  Updated on: Aug 7, 2016
  *  Updated on: Nov 11, 2016
- *  Updated on: Jan 22, 2016
+ *  Updated on: Jan 22, 2017 - Feb 1, 2017
  *      Author: Qige Zhao <qige@6harmonics.com>
  */
 
 #ifndef TASK_H_
 #define TASK_H_
 
-// data types
-typedef unsigned int			uint;
-typedef unsigned char			uchar;
-typedef char					byte;
-typedef unsigned short 			ushort;
+#include "_def.h"
 
 // ...
 enum TASK_ERR {
@@ -27,9 +23,6 @@ enum TASK_ERR {
 };
 
 // start with user input
-int  task(APP_CONF *app_conf);
-
-// clean up before exit
-void task_prepare_exit(void);
+int Task(const void *env);
 
 #endif /* TASK_H_ */

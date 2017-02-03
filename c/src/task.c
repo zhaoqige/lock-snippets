@@ -4,58 +4,77 @@
  *  Created on: Jul 25, 2016
  *  Updated on: Aug 6, 2016
  *  Updated on: Nov 11, 2016
- *  Updated on: Jan 22, 2017
+ *  Updated on: Jan 22, 2017 - Feb 1, 2017
  *      Author: Qige Zhao <qige@6harmonics.com>
  */
 #include <stdio.h>
+#include <unistd.h>
 #include <signal.h>
 
+#include <syslog.h>
+
+#include <sys/ipc.h>
+#include <sys/shm.h>
+
+#include "_env.h"
 #include "app.h"
 #include "task.h"
 
-#if defined(HW_GWS5K) && defined(USE_TPC)
-#include "gws5k.h"
-#endif
+#include "abb_iwinfo.h"
 
-
-int FLAG_SIG_EXIT = 0;
 
 static void task_init(void);
-int (*task_core)(const void *);
-void (*task_exit)(void);
+static void task_prepare_exit(void);
+
+int (*task_run)(const void *);
+void (*task_signal)(void);
 
 
-// TODO: main logic/algorithm
-// make your own algorithm here
-// re-organize your calls here
-int  task(APP_CONF *app_conf)
+// MAIN Calling sequences.
+// - init()
+// - run()
+//
+// if you want to fork a process, do it here;
+int Task(const void *env)
 {
+	int ret;
+
 	task_init();
+	ret = (*task_run)(env);
 
-	(*task_core)(app_conf);
-	(*task_exit)();
-
-	return TASK_OK;
+	return ret;
 }
 
 
 // set function pointer
+// handle signal()
 static void task_init(void)
 {
-#if defined(_HW_GWS5K) && defined(_HW_SPI)
-	task_core = &gws5k_run;
-	task_idle = &gws5k_idle;
+	// hook function
+#if (defined(_ABB_SRC) && (_ABB_SRC == IWINFO))
+	task_run = &Abb_iwinfo_run;
+	task_signal = &Abb_iwinfo_signal;
 #endif
+
+	// release before interrupt/quit/terminated
+	DBG("handling signal(SIGINT, SIGQUIT, SIGTERM)\n");
+	signal(SIGINT, 	(__sighandler_t) task_prepare_exit); //+ "^C"
+	signal(SIGQUIT, (__sighandler_t) task_prepare_exit); //+ "^\"
+	signal(SIGTERM,	(__sighandler_t) task_prepare_exit); //+ "kill", not "kill -9"
+
+	// release zombies
+	// comment next line if "wait()/waitpid()"
+	DBG("handling signal(SIGCHLD): SIG_IGN\n");
+	signal(SIGCHLD, SIG_IGN);
 }
 
 
-// mark FLAG_SIG_EXIT
-void task_prepare_exit(void)
+// call & reset signal(), tell your real executor, it's time to exit
+// so hit ^c twice will interrupt right away
+static void task_prepare_exit(void)
 {
-	printf("\n* SIGNAL caught, prepare to exit!\n");
-
-	// TODO: syslog() signal exit
-	FLAG_SIG_EXIT = 1;
+	LOG("signal(SIGINT, SIGQUIT, SIGTERM) detected, exiting...\n");
+	(*task_signal)();
 
 	signal(SIGQUIT, SIG_DFL);
 	signal(SIGTERM, SIG_DFL);
